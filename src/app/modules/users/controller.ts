@@ -82,11 +82,11 @@ const getSingleUserController = async (req: Request, res: Response) => {
 
 const updateUserController = async (req: Request, res: Response) => {
   const {emptyData} = req.body
-
+  
   const tokenizedRole = req?.user?.role
   const tokenizedId = req?.user?.userId
   
-  const isUpdate = await UserService.updateUser(req.params.id, emptyData,tokenizedRole);
+  const isUpdate = await UserService.updateUser(req.params.id, req.body,tokenizedRole);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

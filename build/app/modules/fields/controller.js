@@ -30,46 +30,93 @@ const createController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         next(error);
     }
 });
-const getAllFieldController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield service_1.FieldService.getAllFields();
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Fields retrieved successfully",
-        data: result,
-    });
+const getAllFieldController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield service_1.FieldService.getAllFields();
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Fields retrieved successfully",
+            data: result,
+        });
+        // res.send({
+        //   statusCode: 200,
+        //   success: true,
+        //   message: "Fields retrieved successfully",
+        //   result,
+        // })
+    }
+    catch (error) {
+        next(error);
+    }
 });
-const getSingleFieldController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield service_1.FieldService.getSingleField(req.params.id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Field fetched successfully",
-        data: result,
-    });
+const getSingleFieldController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield service_1.FieldService.getSingleField(req.params.id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Field fetched successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
-const updateFieldController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUpdate = yield service_1.FieldService.updateField(req.params.id, req.body);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Field for given ID updated successfully",
-        data: isUpdate,
-    });
+const singleFieldByTurfId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield service_1.FieldService.singleFieldByTurfId(req.params.turfId);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Field for given turf id fetched successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
-const deleteFieldController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isDeleted = yield service_1.FieldService.deleteField(req.params.id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Field for given Id deleted successfully",
-        data: isDeleted,
-    });
+const updateFieldController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isUpdate = yield service_1.FieldService.updateField(req.params.id, req.body);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Field for given ID updated successfully",
+            data: isUpdate,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+const deleteFieldController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isDeleted = yield service_1.FieldService.deleteField(req.params.id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Field for given Id deleted successfully",
+            data: isDeleted,
+        });
+        // res.send({
+        //   statusCode: 200,
+        //   success: true,
+        //   message: "Field for given Id deleted successfully",
+        //   isDeleted,
+        // })
+    }
+    catch (error) {
+        next(error);
+    }
 });
 exports.FieldController = {
     createController,
     getAllFieldController,
     getSingleFieldController,
     updateFieldController,
-    deleteFieldController
+    deleteFieldController,
+    singleFieldByTurfId
 };

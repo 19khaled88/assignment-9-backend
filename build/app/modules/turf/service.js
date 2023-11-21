@@ -49,6 +49,7 @@ const createTurfService = (data) => __awaiter(void 0, void 0, void 0, function* 
             select: {
                 name: true,
                 owner: true,
+                imgurl: true,
                 location: true
             }
         });
@@ -96,6 +97,7 @@ const getAllTurfs = (paginatinOptions, filterOptions) => __awaiter(void 0, void 
             name: true,
             location: true,
             owner: true,
+            imgurl: true,
             gameOffers: true,
             fields: true,
             bookings: true
@@ -121,6 +123,7 @@ const getSingleTurf = (id) => __awaiter(void 0, void 0, void 0, function* () {
             name: true,
             location: true,
             owner: true,
+            imgurl: true,
             gameOffers: true,
             fields: true,
             bookings: true

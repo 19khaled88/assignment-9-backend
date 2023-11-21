@@ -43,14 +43,19 @@ const getAllTurfsController = (req, res) => __awaiter(void 0, void 0, void 0, fu
         data: result,
     });
 });
-const getSingleTurfController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield service_1.TurfService.getSingleTurf(req.params.id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Turf fetched successfully",
-        data: result,
-    });
+const getSingleTurfController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield service_1.TurfService.getSingleTurf(req.params.id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Turf fetched successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
 const updateTurfController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const isUpdate = yield service_1.TurfService.updateTurf(req.params.id, req.body);
@@ -61,14 +66,19 @@ const updateTurfController = (req, res) => __awaiter(void 0, void 0, void 0, fun
         data: isUpdate,
     });
 });
-const deleteTurfControler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isDeleted = yield service_1.TurfService.deleteTurf(req.params.id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Turf deleted successfully",
-        data: isDeleted,
-    });
+const deleteTurfControler = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isDeleted = yield service_1.TurfService.deleteTurf(req.params.id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Turf deleted successfully",
+            data: isDeleted,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
 exports.TurfController = {
     createController,

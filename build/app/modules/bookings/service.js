@@ -32,6 +32,7 @@ const createBookingService = (data) => __awaiter(void 0, void 0, void 0, functio
                 id: data.gameOfferId
             }
         });
+        console.log(offeredGame);
         const isExist = yield transactionClient.booking.findFirst({
             where: {
                 AND: [
@@ -44,20 +45,11 @@ const createBookingService = (data) => __awaiter(void 0, void 0, void 0, functio
                         }
                     },
                     {
-                        gameOfferId: offeredGame === null || offeredGame === void 0 ? void 0 : offeredGame.id
-                    },
-                    {
-                        userId: data.userId
-                    },
-                    {
                         turfId: offeredGame === null || offeredGame === void 0 ? void 0 : offeredGame.turfId
                     },
                     {
                         fieldId: offeredGame === null || offeredGame === void 0 ? void 0 : offeredGame.fieldId
                     },
-                    {
-                        gameTypeId: offeredGame === null || offeredGame === void 0 ? void 0 : offeredGame.gameTypeId
-                    }
                 ]
             }
         });
@@ -198,13 +190,49 @@ const getSingleBookingService = (id) => __awaiter(void 0, void 0, void 0, functi
     });
     return isExist;
 });
-const deleteBookingService = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const isDeleted = yield prisma.booking.delete({
+const getBookingsByUserIdSerivce = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma.booking.findMany({
         where: {
-            id: id,
-        },
+            userId: userId
+        }
     });
-    return isDeleted;
+    return result;
+});
+const deleteBookingService = (id, userId, role) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        const isUser = yield transactionClient.booking.findFirst({
+            where: {
+                userId: userId
+            }
+        });
+        if (role === 'USER' && isUser === null) {
+            throw new apiError_1.default(400, 'This user not authorized!');
+        }
+        if (role === 'USER') {
+            const isDeleted = yield transactionClient.booking.delete({
+                where: {
+                    id: id,
+                    userId: userId
+                }
+            });
+            return isDeleted;
+        }
+        // if(role === 'ADMIN' || role === 'SUPER_ADMIN'){
+        // }
+        const isDeleted = yield transactionClient.booking.delete({
+            where: {
+                id: id
+            }
+        });
+        return isDeleted;
+    }));
+    // const isDeleted = await prisma.booking.delete({
+    // 	where: {
+    // 		id: id,
+    // 	},
+    // });
+    // return isDeleted;
+    return response;
 });
 const updateBookingService = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isUpdated = yield prisma.booking.update({
@@ -219,6 +247,7 @@ exports.BookingService = {
     createBookingService,
     getAllBookingService,
     getSingleBookingService,
+    getBookingsByUserIdSerivce,
     deleteBookingService,
     updateBookingService
 };

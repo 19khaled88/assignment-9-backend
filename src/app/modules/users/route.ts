@@ -15,6 +15,7 @@ router.put('/update/:id',authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN,R
 router.post('/signUp',authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN),validateRequest(UserValidation.create), UserController.signUpController)
 router.post('/signIn', UserController.signInController)
 // router.get('/allUsers',UserController.getAllUsersController)
+
 router.get('/allUsers',authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN),UserController.getAllUsersController)
 
 export const UserRouter = router

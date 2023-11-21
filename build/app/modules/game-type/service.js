@@ -26,9 +26,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameTypeService = void 0;
 const client_1 = require("@prisma/client");
 const apiError_1 = __importDefault(require("../../../errors/apiError"));
-const interfaces_1 = require("./interfaces");
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const interfaces_1 = require("./interfaces");
 const prisma = new client_1.PrismaClient();
+const field = 'numberOfPalyers';
 const createGameTypeService = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const isExist = yield transactionClient.gameType.findFirst({
@@ -48,6 +49,7 @@ const createGameTypeService = (data) => __awaiter(void 0, void 0, void 0, functi
             },
             select: {
                 name: true,
+                imgurl: true,
                 numberOfPalyers: true
             }
         });
@@ -58,6 +60,13 @@ const createGameTypeService = (data) => __awaiter(void 0, void 0, void 0, functi
 const getAllGameType = (paginatinOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { searchTerm } = filterOptions, filterData = __rest(filterOptions, ["searchTerm"]);
     const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(paginatinOptions);
+    // if(Object.keys(filterData)[0] === 'numberOfPalyers' && typeof Object.values(filterData)[0] === 'string'){
+    //     //  filterData['numberOfPalyers'] =	
+    // 	//  Number(Object.values(filterData)[0])
+    // 	type T =  keyof typeof filterData
+    // 	Number(filterData[field as keyof typeof filterData])
+    // 	console.log(Number(filterData[field as keyof typeof filterData]), T)
+    // }
     let andConditions = [];
     //searching code
     if (searchTerm) {
@@ -73,11 +82,21 @@ const getAllGameType = (paginatinOptions, filterOptions) => __awaiter(void 0, vo
         });
     }
     //filtering code
+    // if (Object.keys(filterData).length > 0) {
+    // 	andConditions.push({
+    // 		AND: Object.keys(filterData).map((key) => ({
+    // 			[key]: {
+    // 				equals: (filterData as any)[key],
+    // 				mode: 'insensitive'
+    // 			}
+    // 		}))
+    // 	})
+    // }
     if (Object.keys(filterData).length > 0) {
         andConditions.push({
             AND: Object.keys(filterData).map((key) => ({
                 [key]: {
-                    equals: filterData[key]
+                    equals: key === 'numberOfPalyers' ? parseInt(filterData[key]) : filterData[key],
                 }
             }))
         });
@@ -93,6 +112,7 @@ const getAllGameType = (paginatinOptions, filterOptions) => __awaiter(void 0, vo
         select: {
             id: true,
             name: true,
+            imgurl: true,
             numberOfPalyers: true,
             bookings: true,
             GameOffers: true
@@ -116,6 +136,7 @@ const getSingleGameType = (id) => __awaiter(void 0, void 0, void 0, function* ()
         select: {
             id: true,
             name: true,
+            imgurl: true,
             numberOfPalyers: true,
             bookings: true,
             GameOffers: true

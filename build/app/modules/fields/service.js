@@ -88,6 +88,22 @@ const getSingleField = (id) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return isExist;
 });
+const singleFieldByTurfId = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const isExist = yield prisma.field.findFirstOrThrow({
+        where: {
+            turfId: id,
+        },
+        select: {
+            id: true,
+            code: true,
+            turfId: true,
+            size: true,
+            gameOffers: true,
+            bookings: true
+        }
+    });
+    return isExist;
+});
 const deleteField = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const isDeleted = yield prisma.field.delete({
         where: {
@@ -97,18 +113,37 @@ const deleteField = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return isDeleted;
 });
 const updateField = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUpdated = yield prisma.field.update({
-        where: {
-            id: id,
-        },
-        data: payload,
-    });
-    return isUpdated;
+    const transectionResponse = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        const isExist = yield transactionClient.field.findFirst({
+            where: {
+                AND: [
+                    {
+                        code: payload.code
+                    },
+                    {
+                        turfId: payload.turfId
+                    }
+                ]
+            }
+        });
+        if (isExist) {
+            throw new apiError_1.default(400, 'Opps! field with this code already exist');
+        }
+        const isUpdated = yield prisma.field.update({
+            where: {
+                id: id,
+            },
+            data: payload,
+        });
+        return isUpdated;
+    }));
+    return transectionResponse;
 });
 exports.FieldService = {
     createFieldService,
     getAllFields,
     getSingleField,
     updateField,
-    deleteField
+    deleteField,
+    singleFieldByTurfId
 };

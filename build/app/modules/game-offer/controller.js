@@ -30,41 +30,61 @@ const createController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         next(error);
     }
 });
-const getAllGameOfferController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield service_1.GameOfferService.getAllGameOffers();
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Offered games retrieved successfully",
-        data: result,
-    });
+const getAllGameOfferController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield service_1.GameOfferService.getAllGameOffers();
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Offered games retrieved successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
-const getSingleGameOfferController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield service_1.GameOfferService.getSingleGameOffer(req.params.id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Offered game for given ID fetched successfully",
-        data: result,
-    });
+const getSingleGameOfferController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield service_1.GameOfferService.getSingleGameOffer(req.params.id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Offered game for given ID fetched successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
-const updateGameOfferController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUpdate = yield service_1.GameOfferService.updateGameOffer(req.params.id, req.body);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Offered game for given ID updated successfully",
-        data: isUpdate,
-    });
+const updateGameOfferController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isUpdate = yield service_1.GameOfferService.updateGameOffer(req.params.id, req.body);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Offered game updated successfully",
+            data: isUpdate,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
-const deleteGameOfferController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isDeleted = yield service_1.GameOfferService.deleteGameOffer(req.params.id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Offered game for given Id deleted successfully",
-        data: isDeleted,
-    });
+const deleteGameOfferController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isDeleted = yield service_1.GameOfferService.deleteGameOffer(req.params.id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Offered game deleted successfully",
+            data: isDeleted,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
 });
 exports.GameOfferController = {
     createController,

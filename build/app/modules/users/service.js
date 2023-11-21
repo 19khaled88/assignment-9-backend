@@ -32,13 +32,13 @@ const token_1 = require("../../../utils/token");
 const interfaces_1 = require("./interfaces");
 const prisma = new client_1.PrismaClient();
 const signUpServices = (data, token) => __awaiter(void 0, void 0, void 0, function* () {
-    if (data.role === 'ADMIN' && !token) {
-        throw new apiError_1.default(400, 'Token not found or invalid token!!');
+    if (data.role === "ADMIN" && !token) {
+        throw new apiError_1.default(400, "Token not found or invalid token!!");
     }
-    else if (data.role === 'ADMIN' && token) {
+    else if (data.role === "ADMIN" && token) {
         const isSuperAdmin = (0, token_1.verifyJwt)(token);
-        if (isSuperAdmin.role !== 'SUPER_ADMIN') {
-            throw new apiError_1.default(400, 'Unauthorized access!!');
+        if (isSuperAdmin.role !== "SUPER_ADMIN") {
+            throw new apiError_1.default(400, "Unauthorized access!!");
         }
     }
     const hashedPassword = yield bcrypt_1.default.hash(data.password, 12);
@@ -49,7 +49,7 @@ const signUpServices = (data, token) => __awaiter(void 0, void 0, void 0, functi
         });
         const newUser = yield transactionClient.user.findFirst({
             where: {
-                id: result.id
+                id: result.id,
             },
             select: {
                 id: true,
@@ -58,8 +58,8 @@ const signUpServices = (data, token) => __awaiter(void 0, void 0, void 0, functi
                 email: true,
                 contactNo: true,
                 address: true,
-                location: true
-            }
+                location: true,
+            },
         });
         return newUser;
     }));
@@ -72,7 +72,7 @@ const signInServices = (data) => __awaiter(void 0, void 0, void 0, function* () 
         },
     });
     if (isExist === null) {
-        throw new Error('This user does not exist');
+        throw new Error("This user does not exist");
     }
     if (isExist !== null &&
         data.password !== undefined &&
@@ -80,7 +80,7 @@ const signInServices = (data) => __awaiter(void 0, void 0, void 0, function* () 
         const access_token = (0, token_1.signJwt)({ role: isExist.role, userId: isExist.id }, { expiresIn: "2h" });
         return { token: access_token };
     }
-    throw new Error('User sign in error');
+    throw new Error("User sign in error");
 });
 const getAllUsers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { searchTerm } = filterOptions, filterData = __rest(filterOptions, ["searchTerm"]);
@@ -89,11 +89,11 @@ const getAllUsers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 
     //searching code
     if (searchTerm) {
         andConditions.push({
-            OR: interfaces_1.user_search_fields_constant.map(field => {
+            OR: interfaces_1.user_search_fields_constant.map((field) => {
                 return {
                     [field]: {
                         contains: searchTerm,
-                        mode: 'insensitive'
+                        mode: "insensitive",
                     },
                 };
             }),
@@ -104,9 +104,9 @@ const getAllUsers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 
         andConditions.push({
             AND: Object.keys(filterData).map((key) => ({
                 [key]: {
-                    equals: filterData[key]
-                }
-            }))
+                    equals: filterData[key],
+                },
+            })),
         });
     }
     const whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
@@ -114,9 +114,11 @@ const getAllUsers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 
         where: whereCondition,
         skip,
         take: limit,
-        orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder ? {
-            [paginatinOptions.sortBy]: paginatinOptions.sortOrder
-        } : { createAt: 'asc' },
+        orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder
+            ? {
+                [paginatinOptions.sortBy]: paginatinOptions.sortOrder,
+            }
+            : { createAt: "asc" },
         select: {
             id: true,
             name: true,
@@ -125,7 +127,7 @@ const getAllUsers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 
             contactNo: true,
             address: true,
             location: true,
-            bookings: true
+            bookings: true,
         },
     });
     const total = yield prisma.user.count();
@@ -133,9 +135,9 @@ const getAllUsers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 
         meta: {
             total,
             page,
-            limit
+            limit,
         },
-        data: result
+        data: result,
     };
 });
 const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -151,8 +153,8 @@ const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
             contactNo: true,
             address: true,
             location: true,
-            bookings: true
-        }
+            bookings: true,
+        },
     });
     return isExist;
 });
@@ -168,15 +170,17 @@ const updateUser = (id, payload, tokenizedRole) => __awaiter(void 0, void 0, voi
     const updateTransaction = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const isValidUser = yield transactionClient.user.findUnique({
             where: {
-                id: id
-            }
+                id: id,
+            },
         });
-        if (isValidUser && (isValidUser.role === client_1.RoleEnumType.ADMIN || isValidUser.role === client_1.RoleEnumType.SUPER_ADMIN)) {
+        if (isValidUser &&
+            (isValidUser.role === client_1.RoleEnumType.ADMIN ||
+                isValidUser.role === client_1.RoleEnumType.SUPER_ADMIN)) {
             const isUpdate = yield transactionClient.user.update({
                 where: {
-                    id: id
+                    id: id,
                 },
-                data: Object.assign({}, payload)
+                data: Object.assign({}, payload),
             });
             return isUpdate;
         }
@@ -185,10 +189,10 @@ const updateUser = (id, payload, tokenizedRole) => __awaiter(void 0, void 0, voi
                 where: {
                     id: id,
                     AND: {
-                        role: tokenizedRole
-                    }
+                        role: tokenizedRole,
+                    },
                 },
-                data: Object.assign({}, payload)
+                data: Object.assign({}, payload),
             });
             return isUpdate;
         }
@@ -201,5 +205,5 @@ exports.UserService = {
     getAllUsers,
     updateUser,
     deleteUser,
-    getSingleUser
+    getSingleUser,
 };

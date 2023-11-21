@@ -13,6 +13,8 @@ import {
 } from "./interfaces";
 
 const prisma = new PrismaClient();
+
+
 const signUpServices = async (
   data: User,
   token: string | undefined
@@ -119,8 +121,8 @@ const getAllUsers = async (
     orderBy:
       paginatinOptions.sortBy && paginatinOptions.sortOrder
         ? {
-            [paginatinOptions.sortBy]: paginatinOptions.sortOrder,
-          }
+          [paginatinOptions.sortBy]: paginatinOptions.sortOrder,
+        }
         : { createAt: "asc" },
     select: {
       id: true,
@@ -179,6 +181,14 @@ const updateUser = async (
   payload: Partial<User>,
   tokenizedRole: RoleEnumType | undefined
 ): Promise<User> => {
+
+  if (id === undefined || null) {
+    throw new ApiError(400, 'Request is not valid')
+  }
+
+  if (payload === undefined || null) {
+    throw new ApiError(400, 'Update not happend')
+  }
   const updateTransaction = await prisma.$transaction(
     async (transactionClient) => {
       const isValidUser = await transactionClient.user.findUnique({

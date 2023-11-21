@@ -72,17 +72,48 @@ const createGameOfferService = (data) => __awaiter(void 0, void 0, void 0, funct
     return result;
 });
 const getAllGameOffers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma.gameOffer.findMany({
-        select: {
-            id: true,
-            price_per_hour: true,
-            turfId: true,
-            gameTypeId: true,
-            fieldId: true,
-            bookings: true
-        },
-    });
-    return result;
+    const response = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        const result = yield transactionClient.gameOffer.findMany({
+            select: {
+                id: true,
+                price_per_hour: true,
+                turf: {
+                    select: {
+                        name: true,
+                        location: true,
+                        owner: true
+                    }
+                },
+                turfId: true,
+                gameTypeId: true,
+                gameType: {
+                    select: {
+                        name: true,
+                        numberOfPalyers: true
+                    }
+                },
+                fieldId: true,
+                field: {
+                    select: {
+                        code: true,
+                        size: true
+                    }
+                },
+                bookings: {
+                    select: {
+                        start_time: true,
+                        end_time: true,
+                        turfId: true,
+                        gameOfferId: true,
+                        fieldId: true,
+                        userId: true
+                    }
+                },
+            },
+        });
+        return result;
+    }));
+    return response;
 });
 const getSingleGameOffer = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const isExist = yield prisma.gameOffer.findFirstOrThrow({

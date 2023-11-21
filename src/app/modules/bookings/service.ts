@@ -93,6 +93,7 @@ const getAllBookingService = async (role: string, userId: string): Promise<IAllB
 				id: userId
 			}
 		})
+		
 		if (role === RoleEnumType.SUPER_ADMIN || role === RoleEnumType.ADMIN) {
 			const admin_SuperAdmin = await transactionClient.booking.findMany({
 				select: {

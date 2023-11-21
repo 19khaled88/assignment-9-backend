@@ -14,6 +14,7 @@ const router = express_1.default.Router();
 router.delete('/delete/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), controller_1.FieldController.deleteFieldController);
 router.put('/update/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), controller_1.FieldController.updateFieldController);
 router.get('/single/:id', controller_1.FieldController.getSingleFieldController);
+router.get('/singleTurfId/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), controller_1.FieldController.singleFieldByTurfId);
 router.post('/create', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), (0, validationMiddleware_1.default)(validation_1.FieldValidation.create), controller_1.FieldController.createController);
 router.get('/allFields', controller_1.FieldController.getAllFieldController);
 exports.FieldRouter = router;

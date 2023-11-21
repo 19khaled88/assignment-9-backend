@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameOfferRouter = void 0;
+const client_1 = require("@prisma/client");
 const express_1 = __importDefault(require("express"));
+const authCheck_1 = __importDefault(require("../../middleware/authCheck"));
 const validationMiddleware_1 = __importDefault(require("../../middleware/validationMiddleware"));
 const controller_1 = require("./controller");
 const validation_1 = require("./validation");
-const authCheck_1 = __importDefault(require("../../middleware/authCheck"));
-const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 router.delete('/delete/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), controller_1.GameOfferController.deleteGameOfferController);
 router.put('/update/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), controller_1.GameOfferController.updateGameOfferController);

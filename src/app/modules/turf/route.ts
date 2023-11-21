@@ -10,7 +10,8 @@ const router = express.Router()
 router.delete('/delete/:id',authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN), TurfController.deleteTurfControler)
 router.put('/update/:id',authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN), TurfController.updateTurfController)
 router.get('/single/:id', TurfController.getSingleTurfController)
-router.post('/create', authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN),validateRequest(TurfValidation.create), TurfController.createController)
+router.post('/create',  TurfController.createController)
+// router.post('/create', authCheck(RoleEnumType.ADMIN,RoleEnumType.SUPER_ADMIN),validateRequest(TurfValidation.create), TurfController.createController)
 router.get('/allTurfs', TurfController.getAllTurfsController)
 
 export const TurfRouter = router
