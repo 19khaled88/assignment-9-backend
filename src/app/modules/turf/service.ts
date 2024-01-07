@@ -135,7 +135,8 @@ const getSingleTurf = async (id: string): Promise<ITurfResponse | null> => {
 						select:{
 							code:true
 						}
-					}
+					},
+					price_per_hour:true
 				}
 			},
 			fields:true,

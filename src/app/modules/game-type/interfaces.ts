@@ -18,7 +18,7 @@ export type IGameTypeResponse = {
 	name: string,
 	numberOfPalyers: number,
 	imgurl:string,
-	GameOffers?:gameOffer[],
+	GameOffers?:gameOffer[] | any,
 	bookings?:bookings[]
 }
 

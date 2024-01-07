@@ -135,7 +135,26 @@ const getSingleGameType = async (id: string): Promise<IGameTypeResponse | null> 
 			imgurl:true,
 			numberOfPalyers: true,
 			bookings:true,
-			GameOffers:true
+			GameOffers:{
+				select:{
+					field:{
+						select:{
+							code:true
+						}
+					},
+					gameType:{
+						select:{
+							name:true
+						}
+					},
+					turf:{
+						select:{
+							name:true
+						}
+					},
+					price_per_hour:true
+				}
+			}
 		}
 	});
 	return isExist;

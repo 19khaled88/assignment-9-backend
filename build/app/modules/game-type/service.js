@@ -139,7 +139,26 @@ const getSingleGameType = (id) => __awaiter(void 0, void 0, void 0, function* ()
             imgurl: true,
             numberOfPalyers: true,
             bookings: true,
-            GameOffers: true
+            GameOffers: {
+                select: {
+                    field: {
+                        select: {
+                            code: true
+                        }
+                    },
+                    gameType: {
+                        select: {
+                            name: true
+                        }
+                    },
+                    turf: {
+                        select: {
+                            name: true
+                        }
+                    },
+                    price_per_hour: true
+                }
+            }
         }
     });
     return isExist;

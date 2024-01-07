@@ -140,7 +140,8 @@ const getSingleTurf = (id) => __awaiter(void 0, void 0, void 0, function* () {
                         select: {
                             code: true
                         }
-                    }
+                    },
+                    price_per_hour: true
                 }
             },
             fields: true,
