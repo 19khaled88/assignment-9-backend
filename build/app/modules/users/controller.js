@@ -92,7 +92,7 @@ const updateUserController = (req, res) => __awaiter(void 0, void 0, void 0, fun
     const { emptyData } = req.body;
     const tokenizedRole = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.role;
     const tokenizedId = (_b = req === null || req === void 0 ? void 0 : req.user) === null || _b === void 0 ? void 0 : _b.userId;
-    const isUpdate = yield service_1.UserService.updateUser(req.params.id, emptyData, tokenizedRole);
+    const isUpdate = yield service_1.UserService.updateUser(req.params.id, req.body, tokenizedRole);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

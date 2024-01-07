@@ -119,9 +119,28 @@ const getSingleTurf = async (id: string): Promise<ITurfResponse | null> => {
 			location: true,
 			owner: true,
 			imgurl:true,
-			gameOffers:true,
+			gameOffers:{
+				select:{
+					gameType:{
+						select:{
+							name:true
+						}
+					},
+					turf:{
+						select:{
+							name:true
+						}
+					},
+					field:{
+						select:{
+							code:true
+						}
+					}
+				}
+			},
 			fields:true,
-			bookings:true
+			bookings:true,
+			
 		}
 	});
 	return isExist;

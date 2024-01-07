@@ -167,6 +167,12 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return isDeleted;
 });
 const updateUser = (id, payload, tokenizedRole) => __awaiter(void 0, void 0, void 0, function* () {
+    if (id === undefined || null) {
+        throw new apiError_1.default(400, 'Request is not valid');
+    }
+    if (payload === undefined || null) {
+        throw new apiError_1.default(400, 'Update not happend');
+    }
     const updateTransaction = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const isValidUser = yield transactionClient.user.findUnique({
             where: {

@@ -23,7 +23,7 @@ export type ITurfResponse = {
 	owner: string,
 	location: string,
 	imgurl:string,
-	gameOffers?: gameOffer[],
+	gameOffers?: gameOffer[] | any,
 	fields?: fields[],
 	bookings?:bookings[]
 }
