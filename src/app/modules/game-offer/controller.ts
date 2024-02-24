@@ -4,6 +4,8 @@ import httpStatus from "http-status";
 
 import sendResponse from "../../../shared/sendResponse";
 import { GameOfferService } from "./service";
+import pick from "../../../shared/pick";
+import { paginationFields } from "../../../shared/paginationFields";
 
 
 const createController = async (req: Request, res: Response, next: NextFunction) => {
@@ -22,7 +24,9 @@ const createController = async (req: Request, res: Response, next: NextFunction)
 
 const getAllGameOfferController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await GameOfferService.getAllGameOffers();
+    const filterOptions = pick(req.query, ['name', 'location'])
+    const paginationOptions = pick(req.query, paginationFields)
+    const result = await GameOfferService.getAllGameOffers(paginationOptions,filterOptions);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

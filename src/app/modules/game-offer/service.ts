@@ -1,7 +1,12 @@
-import { GameOffer, PrismaClient } from "@prisma/client";
+import { GameOffer, Prisma, PrismaClient } from "@prisma/client";
 import ApiError from "../../../errors/apiError";
-import { IGameOfferesponse, ISingleGameOfferesponse } from "./interfaces";
+import { IGameOfferesponse, ISingleGameOfferesponse, game_offer_search_fields_constant } from "./interfaces";
+import { IPaginationOptions } from "../../../shared/paginationType";
+import { IFilters } from "../../../shared/filterType";
+import { paginationHelper } from "../../../helpers/paginationHelper";
+import { IGenericResponse } from "../../../shared/paginationResponse";
 const prisma = new PrismaClient()
+
 
 
 const createGameOfferService = async (data: GameOffer): Promise<ISingleGameOfferesponse | null> => {
@@ -62,9 +67,90 @@ const createGameOfferService = async (data: GameOffer): Promise<ISingleGameOffer
 };
 
 
-const getAllGameOffers = async (): Promise<any> => {
+const getAllGameOffers = async (paginatinOptions: IPaginationOptions, filterOptions: IFilters): Promise<IGenericResponse<any>> => {
 	const response = await prisma.$transaction(async transactionClient => {
+
+		const { searchTerm, ...filterData } = filterOptions
+		const { limit, page, skip } = paginationHelper.calculatePagination(paginatinOptions)
+
+		let andConditions = []
+
+		//searching code
+		if (searchTerm) {
+			andConditions.push({
+				OR: game_offer_search_fields_constant.map(field => {
+					console.log(field)
+					return {
+						[field]: {
+							contains: searchTerm,
+							mode: 'insensitive'
+						},
+					}
+				}),
+
+				// OR: [
+				// 	...game_offer_search_fields_constant.map(field => ({
+				// 		[field]: {
+				// 			contains: searchTerm,
+				// 			mode: 'insensitive'
+				// 		}
+				// 	})),
+				// 	{ gameType: { contains: searchTerm, mode: 'insensitive' } },
+				// 	{ turf: { contains: searchTerm, mode: 'insensitive' } }
+				// ]
+
+			})
+		}
+
+
+		//filtering code
+		if (Object.keys(filterData).length > 0) {
+			andConditions.push({
+				// AND: Object.keys(filterData).map((key) => {
+				// 	return{
+				// 		[key]: {
+				// 			equals: (filterData as any)[key]
+				// 		}
+				// 	}
+				// })
+				AND: Object.keys(filterData).map((key) => {
+					if (key === 'name') {
+						return {
+							gameType: {
+								[key]: {
+									equals: (filterData as any)[key],
+								}
+							},
+						};
+					} else if (key === 'location') {
+						return {
+							turf: {
+								[key]: {
+									equals: (filterData as any)[key],
+								}
+							}
+						};
+					} else {
+						return {};
+					}
+				}),
+			})
+		}
+
+		const whereCondition: Prisma.GameOfferWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
+
 		const result = await transactionClient.gameOffer.findMany({
+			where: whereCondition,
+			// where:{
+			// 	gameType:{
+			// 		name:'Football'
+			// 	}
+			// },
+			skip,
+			take: limit,
+			orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder ? {
+				[paginatinOptions.sortBy]: paginatinOptions.sortOrder
+			} : { createAt: 'asc' },
 			select: {
 				id: true,
 				price_per_hour: true,
@@ -103,7 +189,15 @@ const getAllGameOffers = async (): Promise<any> => {
 			},
 
 		});
-		return result
+		const total = await prisma.gameOffer.count()
+		return {
+			meta: {
+				limit,
+				page,
+				total
+			},
+			data: result
+		}
 	})
 	return response;
 };

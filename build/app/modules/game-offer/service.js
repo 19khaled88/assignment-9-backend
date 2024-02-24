@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,6 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameOfferService = void 0;
 const client_1 = require("@prisma/client");
 const apiError_1 = __importDefault(require("../../../errors/apiError"));
+const interfaces_1 = require("./interfaces");
+const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const prisma = new client_1.PrismaClient();
 const createGameOfferService = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
@@ -71,9 +84,83 @@ const createGameOfferService = (data) => __awaiter(void 0, void 0, void 0, funct
     }));
     return result;
 });
-const getAllGameOffers = () => __awaiter(void 0, void 0, void 0, function* () {
+const getAllGameOffers = (paginatinOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        const { searchTerm } = filterOptions, filterData = __rest(filterOptions, ["searchTerm"]);
+        const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(paginatinOptions);
+        let andConditions = [];
+        //searching code
+        if (searchTerm) {
+            andConditions.push({
+                OR: interfaces_1.game_offer_search_fields_constant.map(field => {
+                    console.log(field);
+                    return {
+                        [field]: {
+                            contains: searchTerm,
+                            mode: 'insensitive'
+                        },
+                    };
+                }),
+                // OR: [
+                // 	...game_offer_search_fields_constant.map(field => ({
+                // 		[field]: {
+                // 			contains: searchTerm,
+                // 			mode: 'insensitive'
+                // 		}
+                // 	})),
+                // 	{ gameType: { contains: searchTerm, mode: 'insensitive' } },
+                // 	{ turf: { contains: searchTerm, mode: 'insensitive' } }
+                // ]
+            });
+        }
+        //filtering code
+        if (Object.keys(filterData).length > 0) {
+            andConditions.push({
+                // AND: Object.keys(filterData).map((key) => {
+                // 	return{
+                // 		[key]: {
+                // 			equals: (filterData as any)[key]
+                // 		}
+                // 	}
+                // })
+                AND: Object.keys(filterData).map((key) => {
+                    if (key === 'name') {
+                        return {
+                            gameType: {
+                                [key]: {
+                                    equals: filterData[key],
+                                }
+                            },
+                        };
+                    }
+                    else if (key === 'location') {
+                        return {
+                            turf: {
+                                [key]: {
+                                    equals: filterData[key],
+                                }
+                            }
+                        };
+                    }
+                    else {
+                        return {};
+                    }
+                }),
+            });
+        }
+        const whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
         const result = yield transactionClient.gameOffer.findMany({
+            where: whereCondition,
+            // where:{
+            // 	gameType:{
+            // 		name:'Football'
+            // 	}
+            // },
+            skip,
+            take: limit,
+            orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder ? {
+                [paginatinOptions.sortBy]: paginatinOptions.sortOrder
+            } : { createAt: 'asc' },
             select: {
                 id: true,
                 price_per_hour: true,
@@ -111,7 +198,15 @@ const getAllGameOffers = () => __awaiter(void 0, void 0, void 0, function* () {
                 },
             },
         });
-        return result;
+        const total = yield prisma.gameOffer.count();
+        return {
+            meta: {
+                limit,
+                page,
+                total
+            },
+            data: result
+        };
     }));
     return response;
 });
