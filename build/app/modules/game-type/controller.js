@@ -34,7 +34,7 @@ const createController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 });
 const getAllGameTypeController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const filterOptions = (0, pick_1.default)(req.query, ['name', 'numberOfPalyers']);
+        const filterOptions = (0, pick_1.default)(req.query, ['searchTerm', 'name']);
         const paginatinOptions = (0, pick_1.default)(req.query, paginationFields_1.paginationFields);
         const result = yield service_1.GameTypeService.getAllGameType(paginatinOptions, filterOptions);
         (0, sendResponse_1.default)(res, {

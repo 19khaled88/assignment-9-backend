@@ -60,6 +60,11 @@ const createTurfService = (data) => __awaiter(void 0, void 0, void 0, function* 
 const getAllTurfs = (paginatinOptions, filterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { searchTerm } = filterOptions, filterData = __rest(filterOptions, ["searchTerm"]);
     const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(paginatinOptions);
+    // for (let key in filterData) {
+    //     if(filterData[key] != "" && typeof filterData[key] === 'string') {
+    //        filterData[key] = filterData[key].toLowerCase()
+    //     } 
+    // }
     let andConditions = [];
     //searching code
     if (searchTerm) {

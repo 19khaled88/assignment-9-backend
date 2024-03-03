@@ -33,7 +33,7 @@ const createController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
 });
 const getAllTurfsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const filterOptions = (0, pick_1.default)(req.query, ['name', 'location', 'owner']);
+    const filterOptions = (0, pick_1.default)(req.query, ['searchTerm', 'name', 'location', 'owner']);
     const paginationOptions = (0, pick_1.default)(req.query, paginationFields_1.paginationFields);
     const result = yield service_1.TurfService.getAllTurfs(paginationOptions, filterOptions);
     (0, sendResponse_1.default)(res, {

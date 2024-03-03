@@ -58,6 +58,10 @@ export type IGameOfferesponse = {
 // }
 
 
-export const game_offer_search_fields_constant = ['name','location']
+export const game_offer_search_fields_constant = ['game','location']
+export const game_offers_serarch_fields_constant =[
+	{gameType:'name'},
+	{turf:'location'}
+]
 
 

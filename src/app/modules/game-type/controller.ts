@@ -24,7 +24,7 @@ const createController = async (req: Request, res: Response, next: NextFunction)
 
 const getAllGameTypeController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const filterOptions = pick(req.query, ['name', 'numberOfPalyers'])
+    const filterOptions = pick(req.query, ['searchTerm','name'])
     const paginatinOptions = pick(req.query, paginationFields)
 
     const result = await GameTypeService.getAllGameType(paginatinOptions, filterOptions);

@@ -24,7 +24,7 @@ const createController = async (req: Request, res: Response, next: NextFunction)
 
 const getAllTurfsController = async (req: Request, res: Response) => {
 
-  const filterOptions = pick(req.query, ['name', 'location', 'owner'])
+  const filterOptions = pick(req.query, ['searchTerm','name', 'location', 'owner'])
   const paginationOptions = pick(req.query, paginationFields)
   const result = await TurfService.getAllTurfs(paginationOptions, filterOptions);
   sendResponse(res, {

@@ -6,6 +6,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { GameOfferService } from "./service";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../shared/paginationFields";
+import { game_offers_serarch_fields_constant } from "./interfaces";
 
 
 const createController = async (req: Request, res: Response, next: NextFunction) => {
@@ -23,10 +24,11 @@ const createController = async (req: Request, res: Response, next: NextFunction)
 };
 
 const getAllGameOfferController = async (req: Request, res: Response, next: NextFunction) => {
+  
   try {
-    const filterOptions = pick(req.query, ['name', 'location'])
+    const filterOptions = pick(req.query, ['searchTerm', 'game', 'location'])
     const paginationOptions = pick(req.query, paginationFields)
-    const result = await GameOfferService.getAllGameOffers(paginationOptions,filterOptions);
+    const result = await GameOfferService.getAllGameOffers(paginationOptions, filterOptions);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

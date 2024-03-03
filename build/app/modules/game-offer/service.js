@@ -89,28 +89,22 @@ const getAllGameOffers = (paginatinOptions, filterOptions) => __awaiter(void 0, 
         const { searchTerm } = filterOptions, filterData = __rest(filterOptions, ["searchTerm"]);
         const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(paginatinOptions);
         let andConditions = [];
-        //searching code
         if (searchTerm) {
             andConditions.push({
-                OR: interfaces_1.game_offer_search_fields_constant.map(field => {
-                    console.log(field);
-                    return {
-                        [field]: {
-                            contains: searchTerm,
-                            mode: 'insensitive'
-                        },
+                OR: interfaces_1.game_offers_serarch_fields_constant.map(field => {
+                    const fieldName = Object.keys(field)[0]; // Type assertion
+                    const fieldValue = field[fieldName];
+                    console.log(fieldName, fieldValue);
+                    const condition = {
+                        [fieldName]: {
+                            [fieldValue]: {
+                                contains: searchTerm,
+                                mode: 'insensitive'
+                            }
+                        }
                     };
-                }),
-                // OR: [
-                // 	...game_offer_search_fields_constant.map(field => ({
-                // 		[field]: {
-                // 			contains: searchTerm,
-                // 			mode: 'insensitive'
-                // 		}
-                // 	})),
-                // 	{ gameType: { contains: searchTerm, mode: 'insensitive' } },
-                // 	{ turf: { contains: searchTerm, mode: 'insensitive' } }
-                // ]
+                    return condition;
+                })
             });
         }
         //filtering code
@@ -148,14 +142,10 @@ const getAllGameOffers = (paginatinOptions, filterOptions) => __awaiter(void 0, 
                 }),
             });
         }
-        const whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
+        // const whereCondition: Prisma.GameOfferWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
+        const whereCondition = andConditions.length > 0 ? { OR: andConditions } : {};
         const result = yield transactionClient.gameOffer.findMany({
             where: whereCondition,
-            // where:{
-            // 	gameType:{
-            // 		name:'Football'
-            // 	}
-            // },
             skip,
             take: limit,
             orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder ? {

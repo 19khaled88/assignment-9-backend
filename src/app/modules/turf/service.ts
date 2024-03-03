@@ -32,7 +32,7 @@ const createTurfService = async (data: Turf): Promise<ITurfResponse | null> => {
 			select: {
 				name: true,
 				owner: true,
-				imgurl:true,
+				imgurl: true,
 				location: true
 			}
 		})
@@ -41,16 +41,28 @@ const createTurfService = async (data: Turf): Promise<ITurfResponse | null> => {
 	return result;
 };
 
-const getAllTurfs = async (paginatinOptions:IPaginationOptions,filterOptions:IFilters): Promise<IGenericResponse<ITurfResponse[]>> => {
+const getAllTurfs = async (paginatinOptions: IPaginationOptions, filterOptions: IFilters): Promise<IGenericResponse<ITurfResponse[]>> => {
 
-	
-	const {searchTerm, ...filterData} = filterOptions
-	const {limit,page,skip} = paginationHelper.calculatePagination(paginatinOptions)
-    
+
+	const { searchTerm, ...filterData }: { [key: string]: any } = filterOptions
+	const { limit, page, skip } = paginationHelper.calculatePagination(paginatinOptions)
+
+
+
+	// for (let key in filterData) {
+	//     if(filterData[key] != "" && typeof filterData[key] === 'string') {
+	//        filterData[key] = filterData[key].toLowerCase()
+	//     } 
+	// }
+
+
+
+
 	let andConditions = []
 
 	//searching code
 	if (searchTerm) {
+
 		andConditions.push({
 			OR: turf_search_fields_constant.map(field => {
 				return {
@@ -75,35 +87,36 @@ const getAllTurfs = async (paginatinOptions:IPaginationOptions,filterOptions:IFi
 		})
 	}
 
+
 	const whereCondition: Prisma.TurfWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
 
 	const result = await prisma.turf.findMany({
-		where:whereCondition,
+		where: whereCondition,
 		skip,
-		take:limit,
-		orderBy:paginatinOptions.sortBy && paginatinOptions.sortOrder ? {
-			[paginatinOptions.sortBy]:paginatinOptions.sortOrder
-		}:{createAt:'asc'},
+		take: limit,
+		orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder ? {
+			[paginatinOptions.sortBy]: paginatinOptions.sortOrder
+		} : { createAt: 'asc' },
 		select: {
 			id: true,
 			name: true,
 			location: true,
 			owner: true,
-			imgurl:true,
-			gameOffers:true,
-			fields:true,
-			bookings:true
+			imgurl: true,
+			gameOffers: true,
+			fields: true,
+			bookings: true
 		},
 
 	});
 	const total = await prisma.turf.count()
 	return {
-		meta:{
+		meta: {
 			limit,
 			page,
 			total
 		},
-		data:result
+		data: result
 	}
 };
 
@@ -118,30 +131,30 @@ const getSingleTurf = async (id: string): Promise<ITurfResponse | null> => {
 			name: true,
 			location: true,
 			owner: true,
-			imgurl:true,
-			gameOffers:{
-				select:{
-					gameType:{
-						select:{
-							name:true
+			imgurl: true,
+			gameOffers: {
+				select: {
+					gameType: {
+						select: {
+							name: true
 						}
 					},
-					turf:{
-						select:{
-							name:true
+					turf: {
+						select: {
+							name: true
 						}
 					},
-					field:{
-						select:{
-							code:true
+					field: {
+						select: {
+							code: true
 						}
 					},
-					price_per_hour:true
+					price_per_hour: true
 				}
 			},
-			fields:true,
-			bookings:true,
-			
+			fields: true,
+			bookings: true,
+
 		}
 	});
 	return isExist;

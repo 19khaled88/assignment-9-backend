@@ -40,7 +40,7 @@ const createGameTypeService = async (data: GameType): Promise<IGameTypeResponse 
 };
 
 const getAllGameType = async (paginatinOptions:IPaginationOptions,filterOptions:IFilters): Promise<IGenericResponse<IGameTypeResponse[]>> => {
-	const { searchTerm, ...filterData } = filterOptions
+	const { searchTerm, ...filterData }: { [key: string]: any }  = filterOptions
 	const { limit, page, skip } = paginationHelper.calculatePagination(paginatinOptions)
 
 
@@ -69,7 +69,7 @@ const getAllGameType = async (paginatinOptions:IPaginationOptions,filterOptions:
 		})
 	}
 
-
+	
 	//filtering code
 	// if (Object.keys(filterData).length > 0) {
 	// 	andConditions.push({
@@ -91,7 +91,7 @@ const getAllGameType = async (paginatinOptions:IPaginationOptions,filterOptions:
 		})
 	}
 
-	
+
 
 	const whereCondition: Prisma.GameTypeWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
 
