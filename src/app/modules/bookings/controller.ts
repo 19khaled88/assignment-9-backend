@@ -3,6 +3,8 @@ import httpStatus from "http-status";
 
 import sendResponse from "../../../shared/sendResponse";
 import { BookingService } from "./service";
+import pick from "../../../shared/pick";
+import { paginationOptionFields } from "../../../common/paginationOptions";
 
 const createBookingController = async (
   req: Request,
@@ -26,7 +28,9 @@ const createBookingController = async (
 
 const getAllBookingsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await BookingService.getAllBookingService(req?.user?.role, req?.user?.userId);
+    // const filterOptions = pick(req.query, ['vehicle_id','user_id','start_location','end_location','start_time','end_time'])
+    const paginationOptions = pick(req.query, paginationOptionFields)
+    const result = await BookingService.getAllBookingService(req?.user?.role, req?.user?.userId,paginationOptions);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

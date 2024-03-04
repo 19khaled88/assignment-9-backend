@@ -15,10 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingService = void 0;
 const client_1 = require("@prisma/client");
 const apiError_1 = __importDefault(require("../../../errors/apiError"));
+const paginationHelper_1 = require("../../../helpers/paginationHelper");
 // import ApiError from "../../../errors/apiError";
 const prisma = new client_1.PrismaClient();
 const createBookingService = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        if (data.start_time > data.end_time) {
+            throw new apiError_1.default(400, 'End date must be bigger than Start date!');
+        }
         const isUserExist = yield transactionClient.user.findFirst({
             where: {
                 id: data.userId
@@ -32,7 +36,6 @@ const createBookingService = (data) => __awaiter(void 0, void 0, void 0, functio
                 id: data.gameOfferId
             }
         });
-        console.log(offeredGame);
         const isExist = yield transactionClient.booking.findFirst({
             where: {
                 AND: [
@@ -78,20 +81,8 @@ const createBookingService = (data) => __awaiter(void 0, void 0, void 0, functio
     }));
     return result;
 });
-const getAllBookingService = (role, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    // const result = await prisma.booking.findMany({
-    // 	select: {
-    // 		id: true,
-    // 		start_time: true,
-    // 		end_time: true,
-    // 		gameOfferId: true,
-    // 		userId: true,
-    // 		fieldId: true,
-    // 		gameTypeId: true,
-    // 		turfId: true
-    // 	}
-    // });
-    // console.log(role,userId)
+const getAllBookingService = (role, userId, paginatinOptions) => __awaiter(void 0, void 0, void 0, function* () {
+    const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(paginatinOptions);
     const fetchAllTransaction = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const isUser = yield transactionClient.user.findUnique({
             where: {
@@ -100,6 +91,13 @@ const getAllBookingService = (role, userId) => __awaiter(void 0, void 0, void 0,
         });
         if (role === client_1.RoleEnumType.SUPER_ADMIN || role === client_1.RoleEnumType.ADMIN) {
             const admin_SuperAdmin = yield transactionClient.booking.findMany({
+                skip,
+                take: limit,
+                orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder
+                    ? {
+                        [paginatinOptions.sortBy]: paginatinOptions.sortOrder
+                    }
+                    : { createAt: 'asc' },
                 select: {
                     id: true,
                     start_time: true,
@@ -135,6 +133,13 @@ const getAllBookingService = (role, userId) => __awaiter(void 0, void 0, void 0,
                 where: {
                     userId: userId
                 },
+                skip,
+                take: limit,
+                orderBy: paginatinOptions.sortBy && paginatinOptions.sortOrder
+                    ? {
+                        [paginatinOptions.sortBy]: paginatinOptions.sortOrder
+                    }
+                    : { createAt: 'asc' },
                 select: {
                     id: true,
                     start_time: true,
@@ -165,12 +170,16 @@ const getAllBookingService = (role, userId) => __awaiter(void 0, void 0, void 0,
             });
             return user;
         }
-        // else{
-        // 	console.log({success:false})
-        // 	return {success:false}
-        // }
     }));
-    return fetchAllTransaction;
+    const total = fetchAllTransaction === null || fetchAllTransaction === void 0 ? void 0 : fetchAllTransaction.length;
+    return {
+        meta: {
+            limit,
+            page,
+            total: total != undefined ? total : 0
+        },
+        data: fetchAllTransaction
+    };
 });
 const getSingleBookingService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const isExist = yield prisma.booking.findFirstOrThrow({

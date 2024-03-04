@@ -1,6 +1,10 @@
 import { Field, PrismaClient } from "@prisma/client";
 import ApiError from "../../../errors/apiError";
 import { IFieldResponse } from "./interfaces";
+import { IPaginationOptions } from "../../../shared/paginationType";
+import { IFilters } from "../../../shared/filterType";
+import { paginationHelper } from "../../../helpers/paginationHelper";
+import { IGenericResponse } from "../../../shared/paginationResponse";
 const prisma = new PrismaClient()
 
 
@@ -50,8 +54,14 @@ const createFieldService = async (data: Field): Promise<IFieldResponse | null> =
 	return result;
 };
 
-const getAllFields = async (): Promise<IFieldResponse[]> => {
+const getAllFields = async (paginatinOptions: IPaginationOptions, filterOptions: IFilters): Promise<IGenericResponse<IFieldResponse[] | undefined>> => {
+
+	const { searchTerm, ...filterData }: { [key: string]: any } = filterOptions
+	const { limit, page, skip } = paginationHelper.calculatePagination(paginatinOptions)
+
 	const result = await prisma.field.findMany({
+		skip,
+		take:limit,
 		select: {
 			id: true,
 			code: true,
@@ -61,7 +71,16 @@ const getAllFields = async (): Promise<IFieldResponse[]> => {
 			bookings: true
 		},
 	});
-	return result;
+	
+	const total = await prisma.field.count()
+	return {
+		meta:{
+			limit,
+			total,
+			page
+		},
+		data:result
+	};
 };
 
 const getSingleField = async (id: string): Promise<IFieldResponse | null> => {

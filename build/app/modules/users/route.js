@@ -11,10 +11,10 @@ const validationMiddleware_1 = __importDefault(require("../../middleware/validat
 const controller_1 = require("./controller");
 const validation_1 = require("./validation");
 const router = express_1.default.Router();
-router.post('/signUp', controller_1.UserController.signUpController);
 router.get('/single/:id', controller_1.UserController.getSingleUserController);
 router.delete('/delete/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), controller_1.UserController.deleteUserControler);
 router.put('/update/:id', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN, client_1.RoleEnumType.USER), controller_1.UserController.updateUserController);
+router.post('/signUp', controller_1.UserController.signUpController);
 router.post('/signUp', (0, authCheck_1.default)(client_1.RoleEnumType.ADMIN, client_1.RoleEnumType.SUPER_ADMIN), (0, validationMiddleware_1.default)(validation_1.UserValidation.create), controller_1.UserController.signUpController);
 router.post('/signIn', controller_1.UserController.signInController);
 // router.get('/allUsers',UserController.getAllUsersController)

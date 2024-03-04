@@ -4,6 +4,8 @@ import httpStatus from "http-status";
 
 import sendResponse from "../../../shared/sendResponse";
 import { FieldService } from "./service";
+import pick from "../../../shared/pick";
+import { paginationFields } from "../../../shared/paginationFields";
 
 const createController = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -21,7 +23,9 @@ const createController = async (req: Request, res: Response, next: NextFunction)
 
 const getAllFieldController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await FieldService.getAllFields();
+    const filterOptions = pick(req.query, ['searchTerm', 'code', 'size'])
+    const paginationOptions = pick(req.query, paginationFields)
+    const result = await FieldService.getAllFields(paginationOptions,filterOptions);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

@@ -28,9 +28,19 @@ const signUpServices = async (
     }
   }
 
+  const isExist = await prisma.user.findFirst({
+    where: {
+      email: data.email,
+    },
+  });
+  if (isExist) {
+    throw new Error("This user already exist");
+  }
+
   const hashedPassword = await bcrypt.hash(data.password, 12);
   data.password = hashedPassword;
   const userCreated = await prisma.$transaction(async (transactionClient) => {
+
     const result = await prisma.user.create({
       data: data,
     });

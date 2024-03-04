@@ -1,7 +1,7 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 
 import { Prisma } from "@prisma/client";
-import { z,ZodError } from "zod";
+import { ZodError } from "zod";
 import config from "../../config";
 import ApiError from "../../errors/apiError";
 import handleCastError from "../../errors/castError";

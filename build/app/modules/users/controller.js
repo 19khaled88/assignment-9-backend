@@ -61,7 +61,7 @@ const signInController = (req, res) => __awaiter(void 0, void 0, void 0, functio
             (0, sendResponse_1.default)(res, {
                 statusCode: http_status_1.default.UNAUTHORIZED,
                 success: false,
-                message: "User signin unsuccessful",
+                message: "Login unsuccessful",
                 data: "unknow error"
             });
         }

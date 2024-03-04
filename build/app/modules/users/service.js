@@ -41,6 +41,14 @@ const signUpServices = (data, token) => __awaiter(void 0, void 0, void 0, functi
             throw new apiError_1.default(400, "Unauthorized access!!");
         }
     }
+    const isExist = yield prisma.user.findFirst({
+        where: {
+            email: data.email,
+        },
+    });
+    if (isExist) {
+        throw new Error("This user already exist");
+    }
     const hashedPassword = yield bcrypt_1.default.hash(data.password, 12);
     data.password = hashedPassword;
     const userCreated = yield prisma.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {

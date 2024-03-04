@@ -1,12 +1,20 @@
 import { Booking, PrismaClient, RoleEnumType } from "@prisma/client";
 import ApiError from "../../../errors/apiError";
 import { IAllBookingResponse, IBookingResponse } from "./interfaces";
+import { IPaginationOptions } from "../../../shared/paginationType";
+import { IGenericResponse } from "../../../shared/paginationResponse";
+import { paginationHelper } from "../../../helpers/paginationHelper";
 // import ApiError from "../../../errors/apiError";
 const prisma = new PrismaClient()
 
 
 const createBookingService = async (data: Booking): Promise<IBookingResponse | null> => {
 	const result = await prisma.$transaction(async transactionClient => {
+
+		if (data.start_time > data.end_time) {
+			throw new ApiError(400, 'End date must be bigger than Start date!')
+		}
+
 		const isUserExist = await transactionClient.user.findFirst({
 			where: {
 				id: data.userId
@@ -16,12 +24,13 @@ const createBookingService = async (data: Booking): Promise<IBookingResponse | n
 		if (!isUserExist) {
 			throw new ApiError(400, 'This user not exist!')
 		}
+
 		const offeredGame = await transactionClient.gameOffer.findFirst({
 			where: {
 				id: data.gameOfferId
 			}
 		})
-		console.log(offeredGame)
+
 		const isExist = await transactionClient.booking.findFirst({
 			where: {
 				AND: [
@@ -44,13 +53,16 @@ const createBookingService = async (data: Booking): Promise<IBookingResponse | n
 				]
 			}
 		})
+
 		if (isExist) {
 			throw new ApiError(400, 'A booking with this information already exist!')
 		}
+
 		const result = await transactionClient.booking.create({
 			data: data,
 
 		});
+
 		const newGameOffer = await transactionClient.booking.findFirst({
 			where: {
 				id: result.id
@@ -66,26 +78,20 @@ const createBookingService = async (data: Booking): Promise<IBookingResponse | n
 				payment_status: true
 			}
 		})
+
 		return newGameOffer
 	})
 	return result;
 };
 
-const getAllBookingService = async (role: string, userId: string): Promise<IAllBookingResponse[] | undefined> => {
+const getAllBookingService = async (
+	role: string,
+	userId: string,
+	paginatinOptions: IPaginationOptions,
+): Promise<IGenericResponse<IAllBookingResponse[] | undefined>> => {
 
-	// const result = await prisma.booking.findMany({
-	// 	select: {
-	// 		id: true,
-	// 		start_time: true,
-	// 		end_time: true,
-	// 		gameOfferId: true,
-	// 		userId: true,
-	// 		fieldId: true,
-	// 		gameTypeId: true,
-	// 		turfId: true
-	// 	}
-	// });
-	// console.log(role,userId)
+	const { limit, page, skip } =
+		paginationHelper.calculatePagination(paginatinOptions);
 
 	const fetchAllTransaction = await prisma.$transaction(async transactionClient => {
 		const isUser = await transactionClient.user.findUnique({
@@ -93,9 +99,17 @@ const getAllBookingService = async (role: string, userId: string): Promise<IAllB
 				id: userId
 			}
 		})
-		
+
 		if (role === RoleEnumType.SUPER_ADMIN || role === RoleEnumType.ADMIN) {
 			const admin_SuperAdmin = await transactionClient.booking.findMany({
+				skip,
+				take: limit,
+				orderBy:
+					paginatinOptions.sortBy && paginatinOptions.sortOrder
+						? {
+							[paginatinOptions.sortBy]: paginatinOptions.sortOrder
+						}
+						: { createAt: 'asc' },
 				select: {
 					id: true,
 					start_time: true,
@@ -131,7 +145,14 @@ const getAllBookingService = async (role: string, userId: string): Promise<IAllB
 				where: {
 					userId: userId
 				},
-
+				skip,
+				take: limit,
+				orderBy:
+					paginatinOptions.sortBy && paginatinOptions.sortOrder
+						? {
+							[paginatinOptions.sortBy]: paginatinOptions.sortOrder
+						}
+						: { createAt: 'asc' },
 				select: {
 					id: true,
 					start_time: true,
@@ -165,13 +186,17 @@ const getAllBookingService = async (role: string, userId: string): Promise<IAllB
 			return user
 		}
 
-		// else{
-		// 	console.log({success:false})
-		// 	return {success:false}
-		// }
 	})
-
-	return fetchAllTransaction;
+	const total = fetchAllTransaction?.length
+	
+	return {
+		meta: {
+			limit,
+			page,
+			total: total != undefined ? total : 0
+		},
+		data: fetchAllTransaction
+	}
 };
 
 const getSingleBookingService = async (id: string): Promise<IBookingResponse | null> => {

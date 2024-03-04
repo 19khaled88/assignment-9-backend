@@ -51,7 +51,7 @@ const signInController = async (req: Request, res: Response) => {
       sendResponse(res, {
         statusCode: httpStatus.UNAUTHORIZED,
         success: false,
-        message: "User signin unsuccessful",
+        message: "Login unsuccessful",
         data: "unknow error"
       });
     }
